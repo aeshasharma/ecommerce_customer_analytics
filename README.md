@@ -1,156 +1,245 @@
-E-Commerce Customer Analytics & Recommendation System
-A machine-learning powered e-commerce analytics platform that uses historical transaction data to understand customer behavior, segment customers, recommend products, identify churn risk, and estimate customer monetary value.
+# 🛒 E-Commerce Customer Analytics & Recommendation System
 
-🔗 Live Demo: ecom-customer-insights.streamlit.app
+A machine-learning-powered e-commerce analytics platform that analyzes customer purchasing behavior, segments customers, recommends products, predicts churn risk, and estimates customer monetary value.
 
-What This Project Does
-The system takes transaction-level retail data and builds four customer intelligence components:
+🚀 **Live Demo:** https://ecom-customer-insights.streamlit.app
 
-Problem             	 Approach	       Output
-Customer segmentation	  RFM + KMeans 	VIP, Regular, New, At Risk, Lost
-Product recommendation	Implicit ALS	Personalized product rankings
-Churn prediction	 XGBoost Classifier	 Churn risk
-Customer value  	 XGBoost Regressor	   Predicted monetary value
-These components are presented through a Streamlit dashboard.
+## 📌 Project Overview
 
-Dataset
+This project uses machine learning techniques to transform historical e-commerce transaction data into actionable business insights.
 
-The project uses the UCI Online Retail II dataset from a UK-based online retailer covering transactions from December 2009 to December 2011.
+It includes four major components:
 
-~5,900 customers
-4,600+ products
-Transaction-level purchase data
-Customer IDs
-Product codes and descriptions
-Quantity, unit price and transaction dates
+| Problem | Algorithm | Output |
+|---|---|---|
+| Customer Segmentation | RFM + KMeans | VIP, Regular, New, At Risk, Lost |
+| Product Recommendation | Implicit ALS | Personalized Product Recommendations |
+| Churn Prediction | XGBoost Classifier | Customer Churn Risk |
+| Customer Value Prediction | XGBoost Regressor | Predicted Monetary Value |
 
-1. Data Cleaning & Feature Engineering
-The raw transaction data is cleaned before building the models.
+## 📊 Dataset
 
-Cleaning
-Merge the available Online Retail II transaction sheets
-Remove cancelled transactions
-Remove records without a Customer ID
-Calculate transaction revenue
-Revenue = Quantity × UnitPrice
-Customer Features
-Transactions are aggregated into customer-level behavioral features:
+**Dataset:** UCI Online Retail II
 
-Recency — days since last purchase
-Frequency — number of purchases/orders
-Monetary — total spending
-Average Order Value
-Unique Products Purchased
-Customer Tenure
-Because monetary and frequency distributions contain extreme values, clustering features are capped at the 99th percentile and log-transformed before scaling. Original uncapped values are retained separately for reporting.
+The dataset contains transaction records from a UK-based online retailer covering December 2009 to December 2011.
 
-2. Customer Segmentation
-Algorithm: KMeans
-KMeans is used as an unsupervised clustering algorithm to group customers with similar purchasing behavior.
+Dataset features:
+- Customer IDs
+- Product codes and descriptions
+- Purchase quantities
+- Unit prices
+- Transaction dates
 
-The input consists primarily of scaled RFM-based behavioral features.
+## ⚙️ Project Workflow
 
-Selecting K
-The number of clusters was evaluated using:
+1. Data Collection
+2. Data Cleaning and Preprocessing
+3. Feature Engineering
+4. Customer Segmentation
+5. Product Recommendation
+6. Churn Prediction
+7. Customer Value Prediction
+8. Interactive Dashboard Development
 
-Elbow method
-Silhouette score
-The final configuration uses:
+## 1. Customer Segmentation
 
-K = 5
-Silhouette Score = 0.369
-The numerical clusters were then interpreted using their behavioral centroids.
+**Algorithm:** KMeans Clustering
 
-Segment	Recency	Frequency	Monetary
-VIP	43 days	19.1 orders	£8,940
-Regular	65 days	5.5 orders	£1,962
-New Customer	100 days	1.7 orders	£418
-At Risk	398 days	3.3 orders	£1,314
-Lost	521 days	1.2 orders	£249
-The segment names are business interpretations of the resulting KMeans clusters; they are not labels learned directly by KMeans.
+Customer segmentation is performed using RFM analysis:
 
-3. Product Recommendation Engine
-The recommendation system uses implicit collaborative filtering with ALS (Alternating Least Squares).
+- Recency: Days since the last purchase.
+- Frequency: Number of purchases.
+- Monetary: Total customer spending.
 
-Interaction Data
-A sparse:
+Five customer segments are identified:
 
-Customer × Product
-matrix is created from purchase behavior, with purchase quantities used as implicit feedback.
+- VIP Customers
+- Regular Customers
+- New Customers
+- At Risk Customers
+- Lost Customers
 
-The ALS model factorizes this interaction matrix into latent customer and product representations and uses those representations to rank products for each customer.
+**Silhouette Score:** 0.369
 
-Model
-Library: implicit
-Algorithm: Alternating Least Squares (ALS)
-Feedback: Purchase quantity
-Evaluation
-The recommender was evaluated on a held-out test split:
+## 2. Product Recommendation System
 
-Metric	Score
-Precision@10	0.1875
-NDCG@10	0.1829
-Precision@10 measures the relevance of the recommended items within the top 10.
+**Algorithm:** Alternating Least Squares (ALS)
 
-NDCG@10 additionally considers the position of relevant items, giving greater importance to relevant products appearing higher in the ranking.
+The recommendation engine uses implicit collaborative filtering to generate personalized product recommendations.
 
-Cold Start
-The project also includes a popularity-based fallback for customers without sufficient interaction history.
+Features:
+- Customer-product interaction matrix.
+- Purchase quantity as implicit feedback.
+- Personalized product ranking.
+- Previously purchased products filtering.
+- Popularity-based fallback for cold-start customers.
+- TF-IDF-based product similarity.
 
-A TF-IDF vectorizer is also included for content-based product similarity using product descriptions, providing an additional approach for customers/products that cannot be handled effectively by collaborative filtering.
+**Evaluation:**
 
-4. Churn Prediction
-Algorithm: XGBoost Classifier
-Churn is formulated as a binary classification problem.
+| Metric | Score |
+|---|---:|
+| Precision@10 | 0.1875 |
+| NDCG@10 | 0.1829 |
 
-For this project:
+## 3. Customer Churn Prediction
 
-No purchase for 180+ days → Churned
-The model uses customer behavioral features to distinguish between churned and active customers.
+**Algorithm:** XGBoost Classifier
 
-Evaluation
-Metric	Score
-ROC-AUC	0.932
-F1-score	0.81–0.88
-ROC-AUC evaluates how well the classifier separates the two classes across classification thresholds.
+The model identifies customers who may stop purchasing.
 
-F1-score balances precision and recall.
+Project-specific churn definition:
+No purchase for 180 or more days.
 
-The 180-day threshold is a project-specific definition of churn, not a universal business definition.
+**Evaluation:**
 
-5. Customer Value / CLV Model
-Algorithm: XGBoost Regressor
-The project models customer monetary value as a regression problem.
+| Metric | Score |
+|---|---:|
+| ROC-AUC | 0.932 |
+| F1-Score | 0.81–0.88 |
 
-The current implementation predicts historic total customer spend from behavioral features.
+## 4. Customer Value Prediction
 
-Evaluation
-Metric	Score
-R²	0.969
-MAE	£157.13
-R² measures the proportion of variance explained by the regression model.
-MAE represents the average absolute difference between predicted and actual values.
-This implementation should be understood as historical customer-value regression rather than a complete future cash-flow CLV model.
+**Algorithm:** XGBoost Regressor
 
-6. Streamlit Dashboard
-The trained artifacts and prepared datasets are loaded into a Streamlit application.
+This model estimates historical customer monetary value using customer behavioral features.
 
-Dashboard Pages
-Home
-Displays high-level customer metrics.
+**Evaluation:**
 
-Segmentation
-Interactive customer visualization using:
+| Metric | Score |
+|---|---:|
+| R² Score | 0.969 |
+| MAE | £157.13 |
 
-Recency
-Monetary value
-Frequency
-Customer segment
-Recommendations
-Allows a customer to be selected and generates a ranked list of products using the saved ALS model.
+Note: This implementation predicts historical customer spending rather than future lifetime value.
 
-Previously interacted products are filtered from the recommendation results.
+## 📈 Streamlit Dashboard
 
-Churn & CLV
-Displays customer-level behavioral information, churn status and monetary value.
+The project provides an interactive dashboard with four main sections:
+
+**Home**
+- Overall customer insights.
+- Business performance metrics.
+
+**Segmentation**
+- Customer segment visualization.
+- Recency, Frequency and Monetary analysis.
+
+**Recommendations**
+- Select a customer.
+- Generate personalized product recommendations.
+- View ranked product suggestions.
+
+**Churn & Customer Value**
+- Customer churn information.
+- Predicted customer monetary value.
+- Customer behavioral insights.
+
+## 🛠️ Technology Stack
+
+| Category | Technologies |
+|---|---|
+| Programming | Python |
+| Data Processing | Pandas, NumPy |
+| Visualization | Plotly |
+| Machine Learning | Scikit-learn |
+| Clustering | KMeans |
+| Recommendation | Implicit ALS |
+| Content Similarity | TF-IDF |
+| Churn Prediction | XGBoost |
+| Regression | XGBoost |
+| Model Persistence | Joblib, Pickle |
+| Dashboard | Streamlit |
+| Version Control | Git, GitHub |
+
+## 📂 Project Structure
+
+```text
+ecommerce_customer_analytics/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+│
+├── models/
+│   ├── kmeans_model.pkl
+│   ├── scaler.pkl
+│   ├── churn_model.pkl
+│   ├── clv_model.pkl
+│   ├── als_model.pkl
+│   └── als_artifacts.pkl
+│
+└── data/
+    ├── rfm_customers.csv
+    └── product_catalog.csv
+```
+
+*The structure above represents the main project components; adjust it to match the actual repository.*
+
+## 💻 Installation and Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/aeshasharma/ecommerce_customer_analytics.git
+```
+
+### 2. Navigate to the Project
+
+```bash
+cd ecommerce_customer_analytics
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the Application
+
+```bash
+streamlit run app.py
+```
+
+The application will open in your browser through the local Streamlit server.
+
+## 📊 Model Evaluation Summary
+
+| Component | Algorithm | Metric | Result |
+|---|---|---|---:|
+| Segmentation | KMeans | Silhouette Score | 0.369 |
+| Recommendation | ALS | Precision@10 | 0.1875 |
+| Recommendation | ALS | NDCG@10 | 0.1829 |
+| Churn Prediction | XGBoost | ROC-AUC | 0.932 |
+| Churn Prediction | XGBoost | F1-Score | 0.81–0.88 |
+| Customer Value | XGBoost | R² | 0.969 |
+| Customer Value | XGBoost | MAE | £157.13 |
+
+## 🎯 Key Learning Outcomes
+
+- Practical implementation of machine learning algorithms.
+- Customer behavior analysis using RFM techniques.
+- Collaborative filtering and recommendation systems.
+- Classification and regression model development.
+- Data preprocessing and feature engineering.
+- Model evaluation and performance analysis.
+- Interactive dashboard development using Streamlit.
+- Deployment of machine learning applications.
+
+## 👩‍💻 Author
+
+**Aesha Sharma**
+
+MCA | Brainware University
+
+GitHub: https://github.com/aeshasharma
+
+## ⭐ Conclusion
+
+This project combines customer segmentation, personalized product recommendations, churn prediction, and customer value estimation into a single machine-learning-powered e-commerce analytics platform.
+
+It helps transform transaction data into meaningful customer insights and supports data-driven business decisions.
+
+
 
