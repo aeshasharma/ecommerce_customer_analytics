@@ -2,8 +2,6 @@
 
 A machine-learning-powered e-commerce analytics platform that analyzes customer purchasing behavior, segments customers, recommends products, predicts churn risk, and estimates customer monetary value.
 
-🚀 **Live Demo:** https://ecom-customer-insights.streamlit.app
-
 ## 📌 Project Overview
 
 This project uses machine learning techniques to transform historical e-commerce transaction data into actionable business insights.
